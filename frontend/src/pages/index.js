@@ -1,0 +1,17 @@
+export {default as Home} from './home';
+export {default as Browse} from './browse';
+export {default as Signin} from './signin';
+export {default as Signup} from './signup';
+export {default as Profiles} from './profiles';
+export {default as CreateProfile} from './createprofile';
+export {default as AddSubscription} from './add_subscription';
+export {default as AccountSettings} from './accountsettings';
+export {default as UpdateSubscription} from './updatesubscription';
+export {default as CancelSubscription} from './cancelsubscription';
+export {default as SubscriptionHistory} from './subscription_history';
+export {default as DeleteProfile} from './deleteprofile';
+export {default as ProfileInfo} from './profileinfo';
+export {default as UpdatePhone} from './updatephone';
+export {default as UpdatePassword} from './updatepassword';
+export {default as MovieHistory} from './moviehistory';
+export {default as ShowHistory} from './showhistory';
