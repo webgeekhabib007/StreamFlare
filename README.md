@@ -1,4 +1,4 @@
-## Netflix
+## StreamFlare
 A simple movie streaming app made for the term project of CSE 3100 (System Project) at Khulna University of Engineering & Technology.
 ## Demo Video: 
 
