@@ -5,6 +5,7 @@ const dbConfig = {
         user          : "demonode",
         password      : "123",
         connectString : "localhost/xepdb1",
+        poolMax : 10,
     }
 };
 

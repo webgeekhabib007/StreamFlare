@@ -28,7 +28,7 @@ export function AddSubscriptionContainer({ Email }) {
 
         console.log(data);
         setPlans(data.plans);
-        console.log(Plans);
+        console.log("plans : ",Plans);
     }
 
     useEffect(() => {

@@ -6,7 +6,7 @@ import {useNavigate} from 'react-router-dom';
 import {AuthContext} from './../context/auth-context';
 
 export default function CreateProfile() {
-    const history = useNavigate();
+    const navigate = useNavigate();
     const auth = useContext(AuthContext);
 
     const [name,setName] = useState('');
@@ -42,7 +42,7 @@ export default function CreateProfile() {
             console.log(responseData);
 
             if (response.status === 201){
-                history.push(ROUTES.BROWSE); //Successful creation, moves to profiles page
+                navigate(ROUTES.BROWSE); //Successful creation, moves to profiles page
 
                 //TODO: add GET request to get user's profiles + auth token
             } else if (response.status === 400){

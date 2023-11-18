@@ -1,10 +1,11 @@
 const HttpError = require('../models/http-error');
 const database = require('./database');
-const api_key = 'e7bafd491af23dcc2cc134b14174e118';
+const api_key = '36af2cf1e5a1653dc592ba192d078c86';
 const axios = require('axios');
 // const fetch = require('node-fetch');
 const url1 = `https://api.themoviedb.org/3/movie/now_playing?api_key=${api_key}&language=en-US&page=1`;
-const url3 = `https://api.themoviedb.org/3/movie/upcoming?api_key=e7bafd491af23dcc2cc134b14174e118&language=en-US&page=1`;
+const url3 = `https://api.themoviedb.org/3/movie/upcoming?api_key=${api_key}&language=en-US&page=2`;
+const base_img_url = "https://www.themoviedb.org/t/p/w220_and_h330_face/qA5kPYZA7FkVvqcEfJRoOy4kpHg.jpg";
 
 async function fetchMovieData(startPage, totalPages) {
     for (pi = 1; pi <= totalPages; ++pi) {
@@ -90,7 +91,7 @@ async function fetchMovieData(startPage, totalPages) {
 async function fetchGenreData() {
 
 
-    axios.get('https://api.themoviedb.org/3/genre/tv/list?api_key=e7bafd491af23dcc2cc134b14174e118&language=en-US').
+    axios.get(`https://api.themoviedb.org/3/genre/tv/list?api_key=${api_key}&language=en-US`).
         then(function (response) {
             for (i = 0; i < response.data.genres.length; ++i) {
                 let { id, name } = response.data.genres[i];
@@ -138,12 +139,12 @@ async function fetchShowData(totalPages) {
         const req = await axios.get(`https://api.themoviedb.org/3/tv/top_rated?api_key=${api_key}&language=en-US&page=${page}`)
             .then(async function (response) {
                 for (i = 0; i < response.data.results.length; ++i) {
-                    // console.log(response.data.results[i]);
+                    //console.log(response.data.results[i]);
 
                     let { first_air_date, id, overview, original_language,
                         name, vote_average, vote_count, poster_path } = response.data.results[i];
 
-                    const resp = await axios.get(`https://api.themoviedb.org/3/tv/${id}?api_key=e7bafd491af23dcc2cc134b14174e118&language=en-US`);
+                    const resp = await axios.get(`https://api.themoviedb.org/3/tv/${id}?api_key=${api_key}&language=en-US`);
 
                     let { episode_run_time, last_air_date, number_of_episodes, number_of_seasons, status } = resp.data;
 
@@ -164,7 +165,7 @@ async function fetchShowData(totalPages) {
                EXCEPTION
                     WHEN DUP_VAL_ON_INDEX THEN
                         NULL;
-                    WHEN OTHERS
+                    WHEN OTHERS THEN
                         NULL;
                 END;`,
                             {
@@ -182,6 +183,8 @@ async function fetchShowData(totalPages) {
                                 last_air_date: last_air_date
                             });
 
+
+
                         fetchEpisode(id);
 
 
@@ -190,7 +193,7 @@ async function fetchShowData(totalPages) {
                             // console.log(response.data.results[i].genre_ids[j]);
                             database.simpleExecute(`
                     BEGIN
-                    INSERT INTO SHOW_GENRE (SHOW_ID, GENRE_ID) 
+                    INSERT INTO SHOW_GENRE (SHOW_ID, GENRE_ID)
                     VALUES (:show_id, :genre_id);
                     EXCEPTION
                         WHEN DUP_VAL_ON_INDEX THEN
@@ -201,9 +204,9 @@ async function fetchShowData(totalPages) {
                                 show_id: id,
                                 genre_id: genre_id
                             });
-
                         }
                     } catch (err) {
+
                         console.log(err);
                     }
                     //TO_DATE(:release_date, 'yyyy-mm-dd')
@@ -211,7 +214,7 @@ async function fetchShowData(totalPages) {
                 }
 
             }).catch(function (error) {
-                console.log(error);
+                console.log("debq2: ", error);
             }).then(function () {
                 console.log('Yeah!');
             });
@@ -278,7 +281,49 @@ async function movieCredits(totalPages) {
                                             celeb_id: response.data.cast[i].id,
                                             celeb_name: response.data.cast[i].name
                                         });
-                                        console.log(response.data.cast[i].id, response.data.cast[i].name);
+                                        // console.log(response.data.cast[i].id, response.data.cast[i].name);
+
+
+                                    } catch (err) {
+                                        console.log("first: ", err);
+                                    }
+
+                                    try {
+                                        await database.simpleExecute(
+                                            `BEGIN
+                                                INSERT INTO MOVIE_CELEB (CELEB_ID, MOVIE_ID, ROLE) 
+                                                VALUES (:celeb_id, :movie_id, :role);
+                                                EXCEPTION
+                                                    WHEN DUP_VAL_ON_INDEX THEN
+                                                    NULL;
+                                                    WHEN OTHERS THEN
+                                                    NULL;
+                                            END; `, {
+                                            celeb_id: response.data.cast[i].id,
+                                            movie_id: id,
+                                            role: response.data.cast[i].known_for_department
+                                        });
+                                    } catch (error) {
+                                        console.log("second :", error)
+                                    }
+                                }
+                            }
+
+                            for (i = 0; i < response.data.cast.length; ++i) {
+                                if (response.data.cast[i].known_for_department === 'Acting' || response.data.cast[i].known_for_department === 'Directing') {
+                                    try {
+                                        await database.simpleExecute(`
+                                    BEGIN
+                                    INSERT INTO CELEB (CELEB_ID, NAME) VALUES (:celeb_id, :celeb_name);
+                                    EXCEPTION
+                                        WHEN DUP_VAL_ON_INDEX THEN
+                                        NULL;
+                                    END;
+                                    `, {
+                                            celeb_id: response.data.cast[i].id,
+                                            celeb_name: response.data.cast[i].name
+                                        });
+                                        // console.log(response.data.cast[i].id, response.data.cast[i].name);
 
                                         await database.simpleExecute(
                                             `BEGIN
@@ -293,45 +338,6 @@ async function movieCredits(totalPages) {
                                             celeb_id: response.data.cast[i].id,
                                             movie_id: id,
                                             role: response.data.cast[i].known_for_department
-                                        }
-                                        );
-
-
-                                    } catch (err) {
-                                        console.log(err);
-                                    }
-                                }
-                            }
-
-                            for (i = 0; i < response.data.crew.length; ++i) {
-                                if (response.data.crew[i].known_for_department === 'Acting' || response.data.crew[i].known_for_department === 'Directing') {
-                                    try {
-                                        await database.simpleExecute(`
-                                    BEGIN
-                                    INSERT INTO CELEB (CELEB_ID, NAME) VALUES (:celeb_id, :celeb_name);
-                                    EXCEPTION
-                                        WHEN DUP_VAL_ON_INDEX THEN
-                                        NULL;
-                                    END;
-                                    `, {
-                                            celeb_id: response.data.crew[i].id,
-                                            celeb_name: response.data.crew[i].name
-                                        });
-                                        // console.log(response.data.cast[i].id, response.data.cast[i].name);
-
-                                        await database.simpleExecute(
-                                            `BEGIN
-                                    INSERT INTO MOVIE_CELEB (CELEB_ID, MOVIE_ID, ROLE) 
-                                    VALUES (:celeb_id, :movie_id, :role);
-                                    EXCEPTION
-                                        WHEN DUP_VAL_ON_INDEX THEN
-                                        NULL;
-                                        WHEN OTHERS THEN
-                                        NULL;
-                                    END; `, {
-                                            celeb_id: response.data.crew[i].id,
-                                            movie_id: id,
-                                            role: response.data.crew[i].known_for_department
                                         }
                                         );
 
@@ -372,8 +378,7 @@ async function showCredits(totalPages) {
 
                     let { id } = resp.data.results[i];
 
-                    const response = await axios.get(`
-               https://api.themoviedb.org/3/tv/${id}/credits?api_key=${api_key}&language=en-US`);
+                    const response = await axios.get(`https://api.themoviedb.org/3/tv/${id}/credits?api_key=${api_key}&language=en-US`);
 
                     console.log(id);
 
@@ -480,7 +485,7 @@ async function showCredits(totalPages) {
 }
 
 async function fetchEpisode(id) {
-    const resp = await axios.get(`https://api.themoviedb.org/3/tv/${id}?api_key=e7bafd491af23dcc2cc134b14174e118&language=en-US`);
+    const resp = await axios.get(`https://api.themoviedb.org/3/tv/${id}?api_key=${api_key}&language=en-US`);
     // console.log(resp.data);
 
     let { episode_run_time, last_air_date, number_of_episodes, number_of_seasons } = resp.data;
@@ -500,7 +505,7 @@ async function fetchEpisode(id) {
                 EXCEPTION
                     WHEN DUP_VAL_ON_INDEX THEN
                         NULL;
-                    WHEN OTHERS
+                    WHEN OTHERS THEN
                         NULL;
                 END;`, {
                     s_no: season_number,
@@ -512,7 +517,7 @@ async function fetchEpisode(id) {
                 });
 
             } catch (err) {
-                console.log(err);
+                console.log("deebb2: ", err);
             }
         }
     }
@@ -521,13 +526,13 @@ async function fetchEpisode(id) {
 
 }
 
-// fetchGenreData();
-// fetchMovieData(1, 1);
-// fetchShowData(20);
-// movieCredits(20);
-// showCredits(20);
-// fetchEpisode(60059);
+//fetchGenreData();
+//fetchMovieData(1, 1);
+//fetchShowData(20);
+//movieCredits(20);
+//showCredits(20);
+//fetchEpisode(60059);
 
-// fetchMovieData(20);
-// movieCredits(20);
+//fetchMovieData(20);
+//movieCredits(20);
 // export default requests;
