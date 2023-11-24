@@ -186,7 +186,6 @@ async function main(documents, type) {
     if (type === 'movie'){
         for(i = 0; i < documents.length; ++i){
             let arr = query({MOVIE_ID: documents[i].MOVIE_ID, DESCRIPTION: documents[i].DESCRIPTION})
-    
             for(j = 0; j < arr.length; ++j){
                 const {id1, id2, score} = arr[j];
                 

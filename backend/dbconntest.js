@@ -4,6 +4,8 @@ const dbConfig = {
   user: 'demonode',
   password: '123',
   connectString: 'localhost/xepdb1', // Replace with your Oracle Database connection string
+  poolMax: 10,
+  poolMin: 10,
 };
 
 async function run() {
@@ -12,7 +14,7 @@ async function run() {
   try {
     // Establish a connection to the Oracle Database
     connection = await oracledb.createPool(dbConfig);
-    console.log("connected");
+    console.log(connection);
 
     // Your database operations go here
 
