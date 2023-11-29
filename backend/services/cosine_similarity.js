@@ -1,4 +1,4 @@
-const api_key = 'e7bafd491af23dcc2cc134b14174e118';
+const api_key = '36af2cf1e5a1653dc592ba192d078c86';
 const axios = require('axios');
 const database = require('./database');
 

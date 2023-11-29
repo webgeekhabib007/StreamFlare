@@ -12,7 +12,7 @@ export const Title = styled.p`
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
-  margin-bottom: 50px;
+  margin: 25px 100px;
   box-sizing: border-box;
   > ${Title} {
     @media (max-width: 1000px) {
@@ -26,7 +26,7 @@ export const Container = styled.div`
 
 export const Group = styled.div`
   display: flex;
-  flex-direction: ${({ flexDirection }) => (flexDirection === 'row' ? 'row' : 'column')};
+  flex-direction: ${({ flexDirection }) => (flexDirection === 'row' ? 'column' : 'column')};
   ${({ alignItems }) => alignItems && `align-items: ${alignItems}`};
   ${({ margin }) => margin && `margin: ${margin}`};
   > ${Container}:first-of-type {
@@ -49,7 +49,7 @@ export const SubTitle = styled.p`
 export const Text = styled.p`
   margin-top: 5px;
   font-size: 10px;
-  color: #fff;
+  color: red;
   margin-bottom: 0;
   user-select: none;
   display: none;
@@ -59,7 +59,10 @@ export const Text = styled.p`
 export const Entities = styled.div`
   display: flex;
   flex-direction: row;
-  overflow-x: scroll; //testing
+  flex-wrap: wrap;
+  align-items: flex-start;
+  overflow-x: hidden; //testing
+  scrollbar-color: red yellow;
 
 //   ::-webkit-scrollbar {
 //     width: 50px;
@@ -109,7 +112,8 @@ export const Item = styled.div`
   display: flex;
   flex-direction: column;
   flex-wrap : wrap;
-  margin-right: 5px;
+  margin: 5px 5px;
+  border-radius: 10%;
   position: relative;
   cursor: pointer;
   transition: transform 0.2s;
@@ -130,7 +134,7 @@ export const Item = styled.div`
     }
   }
   &:first-of-type {
-    margin-left: 56px;
+    margin-left: 5px;
     @media (max-width: 1000px) {
       margin-left: 30px;
     }

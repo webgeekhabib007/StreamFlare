@@ -1,4 +1,5 @@
 import React, {useState, useEffect,useContext}from 'react';
+import {useNavigate} from 'react-router-dom';
 import { Header, Profiles } from '../components';
 import * as ROUTES from '../constants/routes';
 import logo from '../logo.svg';
@@ -8,6 +9,7 @@ export function SelectProfileContainer({ email, setProfile, setCategory }) {
     const [profiles, setProfiles] = useState([]);
     const auth = useContext(AuthContext);
     const mp=auth.max_profiles;
+    const navigate = useNavigate();
 
     async function fetchFromAPI (){
         console.log('Hello!');
@@ -34,10 +36,13 @@ export function SelectProfileContainer({ email, setProfile, setCategory }) {
         <Header bg={false}>
           <Header.Frame>
             <Header.Logo to={ROUTES.HOME} src={logo} alt="Netflix" />
-            {profiles.length<auth.max_profiles?<Header.ButtonLink to={ROUTES.CREATE_PROFILE}>Create Profile</Header.ButtonLink>:<><Header.ButtonLink onClick = {() => auth.logout()}>
-                Log Out
-        </Header.ButtonLink></>}
-         
+            {profiles.length<auth.max_profiles 
+              ?<Header.ButtonLink to={ROUTES.CREATE_PROFILE}>Create Profile</Header.ButtonLink>
+              :<><Header.ButtonLink onClick = {() =>{ 
+                navigate(ROUTES.SIGN_IN);
+                auth.logout();
+                console.log("logging23 out");
+                 }}>Log Out</Header.ButtonLink></>}
           </Header.Frame>
         </Header>
 

@@ -15,7 +15,7 @@ export function BrowseContainer({ slides }) {
     const [profile, setProfile] = useState({});
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const [slideRows, setSlideRows] = useState([]);
+    const [slideRows, setSlideRows] = useState([23,23]);
     const [profiles, setProfiles] = useState([]);
     const auth = useContext(AuthContext); //auth context
     const navigate = useNavigate();
@@ -62,6 +62,7 @@ export function BrowseContainer({ slides }) {
         // console.log(responseData);
 
         if (responseData.arr) setSlideRows(responseData.arr);
+        console.log("slides: ",slideRows);
       } catch (err){
           console.log(err);
       }
@@ -73,6 +74,7 @@ export function BrowseContainer({ slides }) {
       const response = await fetch(`http://localhost:5000/api/browse/suggestions/?email=${auth.email}&profile_id=${auth.profile}`);
       const responseData = await response.json();
       console.log('Getting response data. . .');
+      console.log(responseData);
       setSlideRows(responseData);
     }
 
@@ -193,7 +195,10 @@ export function BrowseContainer({ slides }) {
                     <Header.TextLink onClick = { () => navigate(ROUTES.ACCOUNT_SETTINGS)}> Settings </Header.TextLink>
                   </Header.Group>
                   <Header.Group>
-                    <Header.TextLink onClick = {() => auth.logout()}>
+                    <Header.TextLink onClick = {() => {
+                        navigate(ROUTES.SIGN_IN);
+                        auth.logout();
+                      }}>
                        Sign Out
                     </Header.TextLink>
                   </Header.Group>
@@ -223,8 +228,20 @@ export function BrowseContainer({ slides }) {
               <Card key={`${category}-${slideItem.title.toLowerCase()}`}>
                 <Card.Title>{slideItem.title}</Card.Title>
                 <Card.Entities>
+                  {/* {
+                    slideItem.data: {
+                      DESCRIPTION,
+                      IMAGE_URL,
+                      MOVIE_ID,
+                      RATING,
+                      RELEASE_DATE,
+                      TIME,
+                      TITLE,
+                      VIDEO_URL
+                    }
+                  } */}
               {slideItem.data.map((item) => (
-                <Card.Item key={item.MOVIE_ID} item={item}>
+                <Card.Item key={item} item={item}>
                   <Card.Image src={`https://image.tmdb.org/t/p/w780${item.IMAGE_URL}`} />
                   <Card.Meta>
                     <Card.SubTitle>{item.TITLE}</Card.SubTitle>

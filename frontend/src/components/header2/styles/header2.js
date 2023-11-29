@@ -38,6 +38,7 @@ export const Link = styled.p`
 
   &:hover {
     font-weight: bold;
+    font-color:#e50914;
   }
 
   &:last-of-type {

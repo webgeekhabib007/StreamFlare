@@ -6,7 +6,7 @@ import { Form,Header } from '../components';
 import logo from '../logo.svg';
 
 export function UpdatePhoneContainer({ Email }) {
-    const history = useNavigate();
+    const navigate = useNavigate();
     const auth = useContext(AuthContext);
     const [phone,set_phone] = useState('');
     const [oldphone,set_oldphone] = useState('');
@@ -51,7 +51,7 @@ export function UpdatePhoneContainer({ Email }) {
             console.log("after submit data in subscribe",responseData);
 
             if (response.status === 201){
-                history.push(ROUTES.ACCOUNT_SETTINGS); //Successful subscription, moves to netflix browse page
+                navigate(ROUTES.ACCOUNT_SETTINGS); //Successful subscription, moves to netflix browse page
 
             } else if (response.status === 422){
                 setError('Invalid user info');

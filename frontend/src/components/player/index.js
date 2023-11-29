@@ -1,5 +1,6 @@
-import React, { useState, useContext, createContext } from 'react';
+import React, { useState, useContext, createContext, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import axios from 'axios';
 import { Container, Button, Overlay, Inner, Close } from './styles/player';
 import VideoPlayer from 'react-video-js-player';
 import ReactPlayer from 'react-player';
@@ -8,6 +9,10 @@ export const PlayerContext = createContext();
 
 export default function Player({ children, ...restProps }) {
   const [showPlayer, setShowPlayer] = useState(false);
+
+  useEffect(()=>{
+    console.log(restProps);
+  });
 
   return (
     <PlayerContext.Provider value={{ showPlayer, setShowPlayer }}>
@@ -18,8 +23,35 @@ export default function Player({ children, ...restProps }) {
 
 Player.Video = function PlayerVideo({ src, itemFeature, ...restProps }) {
   const { showPlayer, setShowPlayer } = useContext(PlayerContext);
+  
   const ref = React.createRef();
   const auth = useContext(AuthContext);
+
+  const [ videoUrl, setVideoUrl ] = useState(null);
+  useEffect(() => {
+    const options = {
+      method: 'GET',
+      url: `https://api.themoviedb.org/3/movie/${itemFeature.MOVIE_ID}/videos`,
+      params: {
+        language: 'en-US',
+        api_key: '36af2cf1e5a1653dc592ba192d078c86'
+      }
+    };
+
+    axios
+      .request(options)
+      .then(function (response) {
+        // Assuming the structure of the response.data includes a video URL
+        const videoUrlFromAPI = response.data.results[0]?.key || null;
+        console.log(videoUrlFromAPI);
+        setVideoUrl(`https://www.youtube.com/watch?v=${videoUrlFromAPI}`);
+      })
+      .catch(function (error) {
+        console.error(error);
+      });
+
+    // The dependency array is empty, so this effect runs once when the component mounts.
+  }, [videoUrl]);
 
   async function saveTime (event){
     console.log('Paused');
@@ -57,9 +89,6 @@ Player.Video = function PlayerVideo({ src, itemFeature, ...restProps }) {
     } catch(err){
       console.log(err);
     }
-    
-    
-    
   }
 
   return showPlayer
@@ -69,9 +98,10 @@ Player.Video = function PlayerVideo({ src, itemFeature, ...restProps }) {
             <ReactPlayer
             ref = {ref} 
             controls
-            url = {itemFeature.VIDEO_URL ? itemFeature.VIDEO_URL : 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'}
-            onPause = {event => saveTime(event)}
-            onPlay = {event => getTime(event)}/>
+            url = { videoUrl ? videoUrl : 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'}
+            // onPause = {(event) => { saveTime(event);}}
+            // onPlay = {event => getTime(event)}
+            />
             <Close />
           </Inner>
         </Overlay>,

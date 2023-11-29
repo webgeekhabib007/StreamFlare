@@ -35,7 +35,7 @@ export default function Card({ children, ...restProps }) {
 
   return (
     <FeatureContext.Provider value={{ showFeature, setShowFeature, itemFeature, setItemFeature }}>
-      <Container {...restProps}>{children}</Container>
+      <Container {...restProps} style={{'scrollbar-color': 'red yellow'}}>{children}</Container>
     </FeatureContext.Provider>
   );
 }
@@ -57,7 +57,7 @@ Card.Text = function CardText({ children, ...restProps }) {
 };
 
 Card.Entities = function CardEntities({ children, ...restProps }) {
-  return <Entities {...restProps}>{children}</Entities>;
+  return <Entities {...restProps} >{children}</Entities>;
 };
 
 Card.Meta = function CardMeta({ children, ...restProps }) {
@@ -141,6 +141,7 @@ Card.Feature = function CardFeature({ children, category, setCategory, setSlideR
     fetchWatchInfo();
     getRating();
     getCeleb();
+    console.log("itemFeature: ", itemFeature);
   }, [itemFeature, showFeature])
 
   
