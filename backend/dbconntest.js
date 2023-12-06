@@ -6,19 +6,17 @@ async function runApp() {
     console.log("Successfully connected to Oracle Database");
 
     // Create a table
-    var resutl = await connection.execute(`select table_name from user_tables`);
+    var profile_id = "habib", email = "hr665102@gmail.com";
+    var resutl = await connection.execute(`SELECT *
+    FROM (
+      SELECT M.TITLE
+      FROM MOVIE_WATCH MW, MOVIE M
+      WHERE M.MOVIE_ID = MW.MOVIE_ID AND MW.PROFILE_ID = '${profile_id}' AND MW.EMAIL = '${email}'
+      ORDER BY TIME DESC
+    )
+    WHERE ROWNUM = 1`);
     console.log(resutl);
 
-    const favoriteGenre = await connection.execute(`
-        SELECT NAME
-        FROM (SELECT G.NAME
-        FROM MOVIE M, MOVIE_GENRE MG, GENRE G, MOVIE_WATCH MW
-        WHERE M.MOVIE_ID = MG.MOVIE_ID AND MG.GENRE_ID = G.GENRE_ID
-                    AND MW.MOVIE_ID = M.MOVIE_ID AND MW.RATING = 10 AND MW.EMAIL = hr665102@gmail.com AND MW.PROFILE_ID = "habib"
-        GROUP BY G.NAME
-        ORDER BY COUNT(*) DESC)
-        WHERE ROWNUM = 1
-        `);
 
   } catch (err) {
     console.error(err);

@@ -533,6 +533,11 @@ on-finished@2.4.1:
   dependencies:
     ee-first "1.1.1"
 
+oracledb@^6.2.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/oracledb/-/oracledb-6.2.0.tgz#7a9d66d923fa1fcc391ff4cb6189e33fd47528b7"
+  integrity sha512-NP6Q3pukVhmowFszQhDfqaiC4RngcuSQ9Vj79quRw9f9s+R1Awo+I1Oexj+qYGFONRJz+Nl7TpkTUiXICbblGg==
+
 parseurl@~1.3.3:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/parseurl/-/parseurl-1.3.3.tgz#9da19e7bee8d12dff0513ed5b76957793bc2e8d4"

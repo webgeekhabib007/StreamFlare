@@ -1,5 +1,6 @@
 import React, { useContext, useState,useEffect} from 'react';
 import {Form, Form2,Header} from '../components';
+import {useNavigate} from 'react-router-dom'
 import * as ROUTES from '../constants/routes';
 import {AuthContext} from './../context/auth-context';
 import { FooterContainer } from '../containers/footer';
@@ -7,6 +8,8 @@ import logo from '../logo.svg';
 
 
 export default function AccountSettings() {
+
+    const navigate = useNavigate();
 
     const [endate,setenddate] = useState('');
     async function fetchFromAPI (){   
@@ -40,7 +43,7 @@ export default function AccountSettings() {
         <Header >
          <Header.Frame  >
             <Header.Logo  to={ROUTES.HOME} src={logo} alt="Netflix" />
-            <Header.ButtonLink onClick = {() => auth.logout()}>
+            <Header.ButtonLink onClick = {() => { navigate(ROUTES.SIGN_IN); auth.logout();}}>
                 Sign Out
             </Header.ButtonLink>
         </Header.Frame>

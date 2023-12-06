@@ -2,6 +2,8 @@ const HttpError = require('../models/http-error');
 const database = require('./database');
 const api_key = '36af2cf1e5a1653dc592ba192d078c86';
 const axios = require('axios');
+const csv = require("csv-parser");
+const fs = require('fs')
 // const fetch = require('node-fetch');
 const url1 = `https://api.themoviedb.org/3/movie/now_playing?api_key=${api_key}&language=en-US&page=1`;
 const url3 = `https://api.themoviedb.org/3/movie/upcoming?api_key=${api_key}&language=en-US&page=2`;
@@ -13,9 +15,8 @@ async function fetchMovieData(startPage, totalPages) {
 
         const url2 = `https://api.themoviedb.org/3/movie/top_rated?api_key=${api_key}&language=en-US&page=${page}`;
 
-        const req = await axios.get(url3)
+        const req = await axios.get(url2)
             .then(function (response) {
-                console.log(response);
 
                 for (i = 0; i < response.data.results.length; ++i) {
                     // console.log(response.data.results[i]);
@@ -526,8 +527,86 @@ async function fetchEpisode(id) {
 
 }
 
+
+
+async function csvtodatabase() {
+    const results = [];
+    fs.createReadStream(`${__dirname}/movies.csv`)
+        .pipe(csv())
+        .on('data', (data) => {
+            // Process each row of data
+            let { release_date, adult, id, overview, original_language, title, vote_average, vote_count, poster_path , genres} = data;
+            adult = 'PG13';
+            
+            try {
+                database.simpleExecute(`
+        BEGIN
+            INSERT INTO MOVIE (MOVIE_ID, TITLE,
+                DESCRIPTION, RELEASE_DATE, RATING, TOTAL_VOTES, IMAGE_URL, LANGUAGE, MATURITY_RATING)
+        VALUES (:movie_id, :title, :overview, TO_DATE (:release_date, 'yyyy-mm-dd'), 
+        :vote_average, :vote_count, :poster_path, :lang, :adult);
+        EXCEPTION
+            WHEN DUP_VAL_ON_INDEX THEN
+                NULL;
+        END;
+       `,
+                    {
+                        movie_id: id,
+                        title: title,
+                        overview: overview,
+                        release_date: release_date,
+                        vote_average: vote_average,
+                        vote_count: vote_count,
+                        poster_path: poster_path,
+                        lang: original_language,
+                        adult: adult
+                    });
+
+
+                    genres_ids = genres.split(" ");
+                    console.log( genres_ids);
+
+
+                for (j = 0; j < genres_ids.length; ++j) {
+                    let genre_id = genres_ids[j];
+                    console.log(genre_id);
+                    database.simpleExecute(`
+        BEGIN
+            INSERT INTO MOVIE_GENRE (MOVIE_ID, GENRE_ID) 
+            VALUES (:movie_id, :genre_id);
+        EXCEPTION
+            WHEN DUP_VAL_ON_INDEX THEN
+                NULL;
+            WHEN OTHERS THEN
+                NULL;
+        END; `, {
+                        movie_id: id,
+                        genre_id: genre_id
+                    });
+
+                }
+
+            } catch (err) {
+                console.log("Error is saving into database :",err);
+            }
+
+        })
+        .on('end', () => {
+            // The CSV file has been fully processed
+            console.log("csv reading ends");
+        })
+        .on('error', (error) => {
+            // Handle any errors that occurred during the processing
+            console.error(error.message);
+        });
+
+}
+
+
+//csvtodatabase();
+
 //fetchGenreData();
-//fetchMovieData(1, 1);
+//fetchMovieData(2, 10);
 //fetchShowData(20);
 //movieCredits(20);
 //showCredits(20);

@@ -652,8 +652,27 @@ const getSuggestions = async (req, res, next) => {
         // ];
 
         var suggestions=null;
+        console.log(email,profile_id);
 
-        axios.get('http://localhost:8000/recommend')
+        // query = `SELECT MW.MOVIE_ID, M.TITLE, M.DESCRIPTION, M.RATING, M.MATURITY_RATING, M.IMAGE_URL
+        // FROM MOVIE_WATCHLIST MW, MOVIE M
+        // WHERE MW.MOVIE_ID = M.MOVIE_ID AND
+        // EMAIL = :email AND PROFILE_ID = :profile_id`;
+
+        // try {
+        //     const result = await database.simpleExecute(query, {
+        //         email: EMAIL,
+        //         profile_id: PROFILE_ID
+        //     });
+
+            
+        //     console.log('getting watchlist for', EMAIL, PROFILE_ID);
+        //     console.log(result);
+        // } catch (err) {
+        //     console.log(err);
+        // }
+
+        axios.get(`http://localhost:8000/recommend/?email=${email}&profile_id=${profile_id}`)
             .then(response => {
                 // Handle the successful response
                 suggestions = [
